@@ -6,8 +6,8 @@ on:
 
 jobs:
   tests:
-    runs-on: ubunti-latest
-    
+    runs-on: ubuntu-latest
+
     steps:
     - name: Копируем код проекта
       uses: actions/checkout@v3
@@ -15,7 +15,7 @@ jobs:
       uses: actions/setup-python@v4
       with: 
         python-version: 3.9
-    - name: Обновляем pip, устанавливаем flake8 и flake8-isort, устанавливаем зависимости проекта
+    - name: Обновляем pip, устанавливаем flake8 и flake8-isort
       run: |
         python -m pip install --upgrade pip 
         pip install flake8==6.0.0 flake8-isort==6.0.0
