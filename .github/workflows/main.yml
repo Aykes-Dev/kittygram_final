@@ -22,4 +22,7 @@ jobs:
     - name: Тесты flake8 
       run: python -m flake8 .
     - name: Pytest
-      run: pytest 
+      run: |
+        pytest 
+        cd backend
+        python manage.py test
