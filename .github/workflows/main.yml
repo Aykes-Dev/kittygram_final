@@ -21,5 +21,5 @@ jobs:
         pip install flake8==6.0.0 flake8-isort==6.0.0
     - name: Тесты flake8 
       run: |
-        python -m flake8 backend/
+        python -m flake8
         cd .. && pytest 
