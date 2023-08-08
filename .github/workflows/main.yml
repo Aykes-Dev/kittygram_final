@@ -102,10 +102,30 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-      - name: Push to DockerHub
+      - name: Билд и пуш образа в Docker Hub
         uses: docker/build-push-action@v4
         with:
           context: ./frontend/
           push: true
           tags: aykisdev/kittygram_frontend:latest
+  
+  build_gateway_and_push_to_docker_hub:
+    name: Билд и пуш на Docker Hub nginx
+    runs-on: ubuntu-latest
+    steps:
+      - name: Получение исходного кода из репозитория
+        uses: actions/checkout@v3
+      - name: Установка сборщика контейнеров Docker
+        uses: docker/setup-buildx-action@v2
+      - name: Авторизация на Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Билд и пуш образа в Docker Hub
+        uses: docker/build-push-action@v4
+        with:
+          context: ./gateway/
+          push: true
+          tags: aykisdev/taski_gateway:latest 
   
