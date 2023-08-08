@@ -5,7 +5,8 @@ on:
       - main
 
 jobs:
-  tests:
+  tests_backend:
+    name: Тест бэкэнда
     runs-on: ubuntu-latest
 
     services:
@@ -45,10 +46,31 @@ jobs:
         cd backend
         python manage.py test
 
-  build_and_push_to_docker_hub:
-    name: Push Docker image to DockerHub
+  frontend_tests:
+    name: Тест фронтенда
     runs-on: ubuntu-latest
-    needs: tests
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Установка NodeJS
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+
+    - name: Установка зависимостей
+      run: |
+        cd frontend/
+        npm ci
+
+    - name: Тест фронтенда
+      run: |
+        cd frontend/
+        npm run test
+
+  build_and_push_to_docker_hub:
+    name: Билд и пуш на Docker Hub бэкэнда
+    runs-on: ubuntu-latest
+    needs: tests_backend
     steps:
       - name: Получение исходного кода из репозитория
         uses: actions/checkout@v3
@@ -62,14 +84,28 @@ jobs:
       - name: Билд и пуш образа в Docker Hub
         uses: docker/build-push-action@v4
         with:
-          # Параметр context: ./backend/ указывает, что нужный Dockerfile 
-          # находится в ./backend/
           context: ./backend/
-          # Параметр push: true указывает, что образ нужно не только собрать,
-          # но и отправить на Docker Hub
           push: true
-          # В параметре tags задаётся название и тег для образа.
-          # Для каждого пересобранного образа 
-          # устанавливаем тег latest, чтобы потом
-          # на сервере и в docker-compose.yml не указывать версию
-          tags: aykisdev/kittygram_backend:latest 
+          tags: aykisdev/kittygram_backend:latest
+  
+  build_frontend_and_push_to_docker_hub:
+    name: Билд и пуш на Docker Hub фронтенда
+    runs-on: ubuntu-latest
+    needs: frontend_tests
+    steps:
+      - name: Получение исходного кода из репозитория
+        uses: actions/checkout@v3
+      - name: Установка сборщика контейнеров Docker
+        uses: docker/setup-buildx-action@v2
+      - name: Авторизация на Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Push to DockerHub
+        uses: docker/build-push-action@v4
+        with:
+          context: ./frontend/
+          push: true
+          tags: aykisdev/kittygram_frontend:latest
+  
