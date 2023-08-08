@@ -125,7 +125,7 @@ jobs:
       - name: Билд и пуш образа в Docker Hub
         uses: docker/build-push-action@v4
         with:
-          context: ./gateway/
+          context: ./nginx/
           push: true
           tags: aykisdev/taski_gateway:latest 
   
