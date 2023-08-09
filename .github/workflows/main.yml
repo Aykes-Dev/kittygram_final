@@ -2,7 +2,7 @@ name: Kittygramm workflow
 on:
   push:
     branches:
-      - main
+      - '*'
 
 jobs:
   tests_backend:
@@ -68,6 +68,7 @@ jobs:
         npm run test
 
   build_and_push_to_docker_hub:
+    if: ${{ github.ref == 'refs/heads/main' }}
     name: Билд и пуш на Docker Hub бэкэнда
     runs-on: ubuntu-latest
     needs: tests_backend
@@ -90,6 +91,7 @@ jobs:
           tags: ${{ secrets.DOCKER_USERNAME }}/kittygram_backend:latest
   
   build_frontend_and_push_to_docker_hub:
+    if: ${{ github.ref == 'refs/heads/main' }}
     name: Билд и пуш на Docker Hub фронтенда
     runs-on: ubuntu-latest
     needs: frontend_tests
@@ -111,6 +113,7 @@ jobs:
           tags: ${{ secrets.DOCKER_USERNAME }}/kittygram_frontend:latest
   
   build_gateway_and_push_to_docker_hub:
+    if: ${{ github.ref == 'refs/heads/main' }}
     name: Билд и пуш на Docker Hub nginx
     runs-on: ubuntu-latest
     steps:
@@ -131,6 +134,7 @@ jobs:
           tags: ${{ secrets.DOCKER_USERNAME }}/taski_gateway:latest 
   
   deploy:
+    if: ${{ github.ref == 'refs/heads/main' }}
     name: Деплой
     runs-on: ubuntu-latest
     needs: 
@@ -178,6 +182,7 @@ jobs:
           sudo docker compose -f docker-compose.yml exec backend cp -r /app/collected_static/. /backend_static/static/ 
   
   send_message:
+    if: ${{ github.ref == 'refs/heads/main' }}
     name: Отправка сообщения в Телеграм
     runs-on: ubuntu-latest
     needs: deploy
