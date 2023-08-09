@@ -2,12 +2,15 @@ name: Kittygramm workflow
 on:
   push:
     branches:
-      - main
+      - '*'
 
 jobs:
   tests_backend:
     name: Тест бэкэнда
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.7", "3.8", "3.9", "3.10"]
 
     services:
       postgres:
@@ -26,8 +29,6 @@ jobs:
       uses: actions/checkout@v3
     - name: Устанавливаем Python
       uses: actions/setup-python@v4
-      with: 
-        python-version: 3.9
     - name: Обновляем pip, устанавливаем зависимости
       run: |
         python -m pip install --upgrade pip 
@@ -68,6 +69,7 @@ jobs:
         npm run test
 
   build_and_push_to_docker_hub:
+    if: ${{ github.ref == 'refs/heads/main' }}
     name: Билд и пуш на Docker Hub бэкэнда
     runs-on: ubuntu-latest
     needs: tests_backend
@@ -84,11 +86,13 @@ jobs:
       - name: Билд и пуш образа в Docker Hub
         uses: docker/build-push-action@v4
         with:
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
           context: ./backend/
           push: true
-          tags: aykisdev/kittygram_backend:latest
+          tags: ${{ secrets.DOCKER_USERNAME }}/kittygram_backend:latest
   
   build_frontend_and_push_to_docker_hub:
+    if: ${{ github.ref == 'refs/heads/main' }}
     name: Билд и пуш на Docker Hub фронтенда
     runs-on: ubuntu-latest
     needs: frontend_tests
@@ -107,9 +111,10 @@ jobs:
         with:
           context: ./frontend/
           push: true
-          tags: aykisdev/kittygram_frontend:latest
+          tags: ${{ secrets.DOCKER_USERNAME }}/kittygram_frontend:latest
   
   build_gateway_and_push_to_docker_hub:
+    if: ${{ github.ref == 'refs/heads/main' }}
     name: Билд и пуш на Docker Hub nginx
     runs-on: ubuntu-latest
     steps:
@@ -127,9 +132,10 @@ jobs:
         with:
           context: ./nginx/
           push: true
-          tags: aykisdev/taski_gateway:latest 
+          tags: ${{ secrets.DOCKER_USERNAME }}/kittygram_gateway:latest 
   
   deploy:
+    if: ${{ github.ref == 'refs/heads/main' }}
     name: Деплой
     runs-on: ubuntu-latest
     needs: 
@@ -157,6 +163,18 @@ jobs:
         passphrase: ${{ secrets.SSH_PASSPHRASE }}
         script: |
           cd kittygram
+          sudo rm .env
+          sudo cat >> .env << EOF
+          POSTGRES_DB=${{ secrets.POSTGRES_DB }}
+          POSTGRES_USER=${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+          DB_NAME=${{ secrets.DB_NAME }}
+          DB_HOST=${{ secrets.DB_HOST }}
+          DB_PORT=${{ secrets.DB_PORT }}
+          SECRET_KEY=${{ secrets.SECRET_KEY }}
+          DEBUG=${{ secrets.DEBUG }}
+          ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }}
+          EOF
           sudo docker compose -f docker-compose.yml pull
           sudo docker compose -f docker-compose.yml down
           sudo docker compose -f docker-compose.yml up -d
@@ -165,6 +183,7 @@ jobs:
           sudo docker compose -f docker-compose.yml exec backend cp -r /app/collected_static/. /backend_static/static/ 
   
   send_message:
+    if: ${{ github.ref == 'refs/heads/main' }}
     name: Отправка сообщения в Телеграм
     runs-on: ubuntu-latest
     needs: deploy
@@ -174,4 +193,4 @@ jobs:
       with:
         to: ${{ secrets.TELEGRAM_TO }}
         token: ${{ secrets.TELEGRAM_TOKEN }}
-        message: Деплой kittygram успешно выполнен! 
+        message: Деплой kittygram успешно выполнен! Автор: ${{ github.actor }}
