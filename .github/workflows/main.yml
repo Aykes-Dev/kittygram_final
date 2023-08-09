@@ -87,7 +87,7 @@ jobs:
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
           context: ./backend/
           push: true
-          tags: aykisdev/kittygram_backend:latest
+          tags: ${{ secrets.DOCKER_USERNAME }}/kittygram_backend:latest
   
   build_frontend_and_push_to_docker_hub:
     name: Билд и пуш на Docker Hub фронтенда
@@ -108,7 +108,7 @@ jobs:
         with:
           context: ./frontend/
           push: true
-          tags: aykisdev/kittygram_frontend:latest
+          tags: ${{ secrets.DOCKER_USERNAME }}/kittygram_frontend:latest
   
   build_gateway_and_push_to_docker_hub:
     name: Билд и пуш на Docker Hub nginx
@@ -128,7 +128,7 @@ jobs:
         with:
           context: ./nginx/
           push: true
-          tags: aykisdev/taski_gateway:latest 
+          tags: ${{ secrets.DOCKER_USERNAME }}/taski_gateway:latest 
   
   deploy:
     name: Деплой

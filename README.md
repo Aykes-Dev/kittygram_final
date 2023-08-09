@@ -1,27 +1,89 @@
 [![Kittygramm workflow](https://github.com/Aykes-Dev/kittygram_final/actions/workflows/main.yml/badge.svg)](https://github.com/Aykes-Dev/kittygram_final/actions/workflows/main.yml)
-#  Как работать с репозиторием финального задания
+#  Kittygram - социальная сеть
+Kittygram - социальная сеть, специально созданная для любителей кошек. Здесь вы сможете делиться фотографиями своих питомцев. Это идеальная платформа для всех кошачьих ценителей, которые хотят поделиться своими кошачьими моментами и находить новых друзей со схожими интересами.
 
-## Что нужно сделать
 
-Настроить запуск проекта Kittygram в контейнерах и CI/CD с помощью GitHub Actions
+## Технологии
+#### 1. Frontend:
+- Node.js
+- Next.js
+- React
 
-## Как проверить работу с помощью автотестов
+\* Полный список библиотек в файле packeje.json
 
-В корне репозитория создайте файл tests.yml со следующим содержимым:
-```yaml
-repo_owner: ваш_логин_на_гитхабе
-kittygram_domain: полная ссылка (https://доменное_имя) на ваш проект Kittygram
-taski_domain: полная ссылка (https://доменное_имя) на ваш проект Taski
-dockerhub_username: ваш_логин_на_докерхабе
+#### 2. Backend:
+- Django
+- DRF
+- Gunicorn
+- Pillow
+
+\* Полный список библиотек в файле requirements.txt
+
+#### 3. Сервер:
+nginx
+
+#### 4. Деплой
+- Docker
+- Docker compose
+
+## Развертывание
+1. Скачиваем файл docker-compose.yml из репозитория https://github.com/Aykes-Dev/kittygram_final/blob/main/
+
+2. Создает файл .env
+```
+touch .env
+```
+3. Записываем в файл переменные окружения
+```
+POSTGRES_DB=<имя БД>
+POSTGRES_USER=<имя пользователя>
+POSTGRES_PASSWORD=<пароль>
+DB_NAME=<имя БД>
+DB_HOST=db
+DB_PORT=5432
+SECRET_KEY=<секретный ключ Django>
+DEBUG=<режим DEBUG True/False>
+ALLOWED_HOSTS=<разрешенные хосты>
+TEST_BASE=<Использование SQLite - True, Postgres - False>
 ```
 
-Скопируйте содержимое файла `.github/workflows/main.yml` в файл `kittygram_workflow.yml` в корневой директории проекта.
+4. Запускаем Docker compose
+```
+sudo docker compose -f docker-compose.yml pull
+sudo docker compose -f docker-compose.yml down
+sudo docker compose -f docker-compose.yml up -d
+```
+5. Собираеми уопируем статику, делаем миграции
+```
+sudo docker compose -f docker-compose.yml exec backend python manage.py migrate
+sudo docker compose -f docker-compose.yml exec backend python manage.py collectstatic
+sudo docker compose -f docker-compose.yml exec backend cp -r /app/collected_static/. /backend_static/static/ 
+```
 
-Для локального запуска тестов создайте виртуальное окружение, установите в него зависимости из backend/requirements.txt и запустите в корневой директории проекта `pytest`.
+## Автодеплой с помощью Git Hub Action 
+1. Скачиваем репозиторий
+```
+git@github.com:Aykes-Dev/kittygram_final.git
+```
+2. Добавляем перменные в Secrets
+```
+ALLOWED_HOSTS - разрешенные хосты
+DB_HOST - имя БД
+DB_NAME - db
+DB_PORT - 5432
+DEBUG - True/False режим DEBUG Django
+DOCKER_PASSWORD - пароль от Docker Hub
+DOCKER_USERNAME - имя пользователя Docker Hub
+HOST - ip сервера
+POSTGRES_DB - имя БД
+POSTGRES_PASSWORD - пароль БД
+POSTGRES_USER - имя пользователя БД
+SECRET_KEY - секретный ключ Django
+SSH_KEY - ключ ssh для доступа к удаленному серверу
+SSH_PASSPHRASE - пароль ssh
+TELEGRAM_TO - id пользователя TELEGRAM
+TELEGRAM_TOKEN - TELEGRAM токен
+USER - имя пользователя сервера
+```
 
-## Чек-лист для проверки перед отправкой задания
-
-- Проект Taski доступен по доменному имени, указанному в `tests.yml`.
-- Проект Kittygram доступен по доменному имени, указанному в `tests.yml`.
-- Пуш в ветку main запускает тестирование и деплой Kittygram, а после успешного деплоя вам приходит сообщение в телеграм.
-- В корне проекта есть файл `kittygram_workflow.yml`.
+### Автор: [Андрей Савостьянов](https://github.com/Aykes-Dev)
