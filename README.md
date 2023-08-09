@@ -1,4 +1,4 @@
-![Kittygram action](https://github.com/Aykes-Dev/kittygram_final/blob/main/.github/workflows/main.yml/badge.svg)
+[![Kittygramm workflow](https://github.com/Aykes-Dev/kittygram_final/actions/workflows/main.yml/badge.svg)](https://github.com/Aykes-Dev/kittygram_final/actions/workflows/main.yml)
 #  Как работать с репозиторием финального задания
 
 ## Что нужно сделать
