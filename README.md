@@ -1,3 +1,4 @@
+![Kittygram action](https://github.com/Aykes-Dev/kittygram_final/blob/main/.github/workflows/main.yml/badge.svg)
 #  Как работать с репозиторием финального задания
 
 ## Что нужно сделать
