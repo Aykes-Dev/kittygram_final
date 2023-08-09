@@ -159,7 +159,7 @@ jobs:
         script: |
           cd kittygram
           sudo cat >> .vv << EOF
-          SECRET_KEY=${{ secret.SECRET_KEY }}
+          SECRET_KEY=${{ secrets.SECRET_KEY }}
           EOF
           sudo docker compose -f docker-compose.yml pull
           sudo docker compose -f docker-compose.yml down
