@@ -26,6 +26,9 @@ services:
     volumes:
       - static:/frontend_static
   gateway:
+    depends_on: 
+      - backend
+      - frontend
     image: aykisdev/kittygram_gateway
     env_file: .env
     ports:
